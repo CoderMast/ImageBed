@@ -1,7 +1,10 @@
 package com.codermast.imagebedbackend.controller;
 
 
+import com.alibaba.fastjson2.JSON;
+import com.codermast.imagebedbackend.entity.Image;
 import com.codermast.imagebedbackend.service.ImageService;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,9 +39,22 @@ public class ImageController {
         }
 
         // 这里已经可以确保上传的文件是图片了，开始执行图片上传逻辑
-        boolean isUpload = imageService.uploadImage(file);
+        Image image = imageService.uploadImage(file);
+
+        if (image == null) {
+            return "fail";
+        }
+
 
         // 返回上传结果
-        return isUpload ? "success" : "fail";
+        return JSON.toJSONString(image);
+    }
+
+
+    // 查看图片列表
+    @GetMapping("/list")
+    public List<Image> list() {
+        List<Image> list = imageService.getAll();
+        return list;
     }
 }

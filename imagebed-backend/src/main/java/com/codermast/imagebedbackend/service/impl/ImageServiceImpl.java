@@ -1,20 +1,28 @@
 package com.codermast.imagebedbackend.service.impl;
 
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codermast.imagebedbackend.entity.Image;
+import com.codermast.imagebedbackend.mapper.ImageMapper;
 import com.codermast.imagebedbackend.service.ImageService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
 import java.util.Calendar;
+import java.util.List;
 
 @Service
-public class ImageServiceImpl implements ImageService {
+public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements ImageService {
     // 图片上传
     @Override
-    public boolean uploadImage(MultipartFile file) throws IOException {
+    public Image uploadImage(MultipartFile file) throws IOException {
         // 上传文件的原始名称 —— 带文件后缀
         String originalFilename = file.getOriginalFilename();
 
@@ -54,6 +62,30 @@ public class ImageServiceImpl implements ImageService {
         outputStream.close();
         inputStream.close();
 
-        return true;
+        // 获取图片的MD5
+        String md5 = DigestUtils.md5DigestAsHex(file.getInputStream());
+        LambdaQueryWrapper<Image> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Image::getMd5,md5);
+
+        // 判断 MD5 是否存在
+        Image existImage = this.getOne(queryWrapper);
+        if (existImage != null){
+            return existImage;
+        }
+
+        // 构建图片实体
+        Image savaImage = new Image();
+        savaImage.setUrl(preUrl.getPath() + File.separator + originalFilename);
+        savaImage.setMd5(md5);
+        this.save(savaImage);
+
+        return savaImage;
+    }
+
+    // 查询所有图片
+    @Override
+    public List<Image> getAll() {
+        LambdaQueryWrapper<Image> queryWrapper = new LambdaQueryWrapper<>();
+        return this.list(queryWrapper);
     }
 }
