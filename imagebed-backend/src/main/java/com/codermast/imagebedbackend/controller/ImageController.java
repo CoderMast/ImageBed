@@ -31,6 +31,7 @@ public class ImageController {
         }
 
         String[] split = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
+
         // 文件后缀名
         String suffix = split[split.length - 1];
 
@@ -44,7 +45,6 @@ public class ImageController {
         if (image == null) {
             return "fail";
         }
-
 
         // 返回上传结果
         return JSON.toJSONString(image);

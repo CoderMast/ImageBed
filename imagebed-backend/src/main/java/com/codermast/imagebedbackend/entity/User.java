@@ -8,16 +8,15 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("images")
-public class Image {
+@TableName("users")
+public class User {
     @TableId(type = IdType.AUTO)
-    private Long id;
-    private String url;
-    private String md5;
-    private Long author;
-    private LocalDateTime upload_time;
-
-    public Image(){
-        this.upload_time = LocalDateTime.now();
-    }
+    private Long uid;
+    private String username;
+    private String password;
+    private String email;
+    private Boolean status;
+    private LocalDateTime create_time;
+    private LocalDateTime login_time;
+    private Boolean isAdmin;
 }

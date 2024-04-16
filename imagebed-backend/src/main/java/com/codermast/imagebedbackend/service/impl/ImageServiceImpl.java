@@ -3,6 +3,7 @@ package com.codermast.imagebedbackend.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.codermast.imagebedbackend.context.BaseContext;
 import com.codermast.imagebedbackend.entity.Image;
 import com.codermast.imagebedbackend.mapper.ImageMapper;
 import com.codermast.imagebedbackend.service.ImageService;
@@ -14,7 +15,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.List;
 
@@ -77,6 +77,7 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
         Image savaImage = new Image();
         savaImage.setUrl(preUrl.getPath() + File.separator + originalFilename);
         savaImage.setMd5(md5);
+        savaImage.setAuthor(BaseContext.getCurrentId());
         this.save(savaImage);
 
         return savaImage;
