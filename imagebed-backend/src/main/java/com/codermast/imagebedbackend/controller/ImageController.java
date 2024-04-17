@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,5 +60,28 @@ public class ImageController {
     public Result<List<Image>> list() {
         List<Image> list = imageService.getAll();
         return Result.success(list);
+    }
+
+    // 删除指定图片
+    @DeleteMapping("/remove")
+    public Result<Image> remove(@RequestBody Image image) {
+        boolean b = imageService.removeById(image);
+        if (b){
+            return Result.success("删除成功");
+        }else {
+            return Result.error("删除失败");
+        }
+    }
+
+    // 批量删除图片
+    @DeleteMapping("/removeList")
+    public Result<Image> removeList(@RequestBody List<Image> images) {
+        boolean b = imageService.removeByIds(images);
+
+        if (b){
+            return Result.success("删除成功");
+        }else {
+            return Result.error("删除失败");
+        }
     }
 }
