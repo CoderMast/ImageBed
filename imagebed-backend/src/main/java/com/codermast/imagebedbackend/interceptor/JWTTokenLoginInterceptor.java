@@ -30,6 +30,14 @@ public class JWTTokenLoginInterceptor implements HandlerInterceptor {
         // 从请求头中获取 token 令牌
         String token = request.getHeader(jwtProperties.getAdminTokenName());
 
+        if (token == null || token.isEmpty()) {
+            // 不通过，响应 401 状态码
+            response.setStatus(401);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().println("{\"message\":\"Token is empty\"}");
+            return false;
+        }
         try {
             Claims claims = JWTUtils.parseJWT(jwtProperties.getAdminSecretKey(), token);
             // TODO: 将 UID 抽离

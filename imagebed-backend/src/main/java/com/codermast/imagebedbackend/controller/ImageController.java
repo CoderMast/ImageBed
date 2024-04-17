@@ -1,6 +1,5 @@
 package com.codermast.imagebedbackend.controller;
 
-
 import com.codermast.imagebedbackend.entity.Image;
 import com.codermast.imagebedbackend.entity.Result;
 import com.codermast.imagebedbackend.service.ImageService;

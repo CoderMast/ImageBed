@@ -16,7 +16,7 @@ public class User {
     private String password;
     private String email;
     private Boolean status;
-    private LocalDateTime create_time;
-    private LocalDateTime login_time;
+    private LocalDateTime createTime;
+    private LocalDateTime loginTime;
     private Boolean isAdmin;
 }
