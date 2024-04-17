@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 
@@ -23,10 +23,9 @@ import java.util.List;
 public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements ImageService {
     // 图片上传
     @Override
-    public List<Image> uploadImage(MultipartFile... files) throws IOException {
-
-        List<Image> ret = new ArrayList<>();
-        for (MultipartFile file : files) {
+    public Image uploadImage(MultipartFile file){
+        Image imageRet = new Image();
+        try {
             // 上传文件的原始名称 —— 带文件后缀
             String originalFilename = file.getOriginalFilename();
 
@@ -69,29 +68,31 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
             // 获取图片的MD5
             String md5 = DigestUtils.md5DigestAsHex(file.getInputStream());
             LambdaQueryWrapper<Image> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(Image::getMd5,md5);
+            queryWrapper.eq(Image::getMd5, md5);
 
             // 判断 MD5 是否存在
             Image existImage = this.getOne(queryWrapper);
-            if (existImage != null){
-                ret.add(existImage);
+            if (existImage != null) {
+                return existImage;
             }
 
             // 构建图片实体
             Image savaImage = new Image();
             savaImage.setUrl(preUrl.getPath() + File.separator + originalFilename);
             savaImage.setMd5(md5);
-            if (BaseContext.getCurrentId() != null){
+            savaImage.setUploadTime(LocalDateTime.now());
+            if (BaseContext.getCurrentId() != null) {
                 savaImage.setAuthor(BaseContext.getCurrentId());
-            }else {
+            } else {
                 // 如果当前是游客，则设置作者为 -1
                 savaImage.setAuthor(-1L);
             }
             this.save(savaImage);
+            imageRet = savaImage;
+        }catch (IOException e){
+            e.printStackTrace();
         }
-
-
-        return ret;
+        return imageRet;
     }
 
     // 查询所有图片

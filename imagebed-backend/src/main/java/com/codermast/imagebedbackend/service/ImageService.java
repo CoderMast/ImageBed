@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ImageService extends IService<Image> {
     // 上传图片
-    List<Image> uploadImage(MultipartFile... file) throws IOException;
+    Image uploadImage(MultipartFile file);
 
     List<Image> getAll();
 }

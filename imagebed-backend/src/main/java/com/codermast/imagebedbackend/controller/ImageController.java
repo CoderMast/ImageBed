@@ -1,16 +1,15 @@
 package com.codermast.imagebedbackend.controller;
 
 
-import com.alibaba.fastjson2.JSON;
 import com.codermast.imagebedbackend.entity.Image;
 import com.codermast.imagebedbackend.entity.Result;
 import com.codermast.imagebedbackend.service.ImageService;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -26,32 +25,41 @@ public class ImageController {
 
     // 图片上传
     @PostMapping("/upload")
-    public Result<List<Image>> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            return Result.error("文件为空");
+    public Result<List<Image>> uploadImage(@RequestParam("file") MultipartFile... files){
+        List<Image> ret = new ArrayList<>();
+        for (MultipartFile file : files) {
+
+
+            if (file.isEmpty()) {
+                //return Result.error("文件为空");
+                ret.add(null);
+                break;
+            }
+
+            String[] split = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
+
+            // 文件后缀名
+            String suffix = split[split.length - 1];
+
+            if (!imgSuffixNames.contains(suffix)) {
+                //return Result.error("上传的文件不是图片");
+                ret.add(null);
+                break;
+            }
+
+            // 这里已经可以确保上传的文件是图片了，开始执行图片上传逻辑
+            Image image = imageService.uploadImage(file);
+            ret.add(image);
         }
-
-        String[] split = Objects.requireNonNull(file.getOriginalFilename()).split("\\.");
-
-        // 文件后缀名
-        String suffix = split[split.length - 1];
-
-        if (!imgSuffixNames.contains(suffix)) {
-            return Result.error("上传的文件不是图片");
-        }
-
-        // 这里已经可以确保上传的文件是图片了，开始执行图片上传逻辑
-        List<Image> imageList = imageService.uploadImage(file);
-
         // 返回上传结果
-        return Result.success(imageList);
+        return Result.success(ret);
     }
 
 
     // 查看图片列表
     @GetMapping("/list")
-    public List<Image> list() {
+    public Result<List<Image>> list() {
         List<Image> list = imageService.getAll();
-        return list;
+        return Result.success(list);
     }
 }

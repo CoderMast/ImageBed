@@ -15,9 +15,5 @@ public class Image {
     private String url;
     private String md5;
     private Long author;
-    private LocalDateTime upload_time;
-
-    public Image(){
-        this.upload_time = LocalDateTime.now();
-    }
+    private LocalDateTime uploadTime;
 }
