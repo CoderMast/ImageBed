@@ -12,7 +12,10 @@ spring:
     time-zone: GMT+8
   servlet:
     multipart:
+      # 单个文件的大小
       max-file-size: -1
+      # 总文件大小
+      max-request-size: -1
 imagebed:
   jwt:
     # 设置 JWT 签名加密时使用的秘钥
