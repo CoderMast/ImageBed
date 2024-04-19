@@ -15,7 +15,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/image")
 public class ImageController {
-
+    // 图片后缀名列表
     private static final List<String> imgSuffixNames = Arrays.asList("jpg", "jpeg", "png", "gif", "webp", "ico");
 
     @Autowired
@@ -26,7 +26,6 @@ public class ImageController {
     public Result<List<Image>> uploadImage(@RequestParam("file") MultipartFile... files){
         List<Image> ret = new ArrayList<>();
         for (MultipartFile file : files) {
-
 
             if (file.isEmpty()) {
                 //return Result.error("文件为空");
@@ -64,8 +63,8 @@ public class ImageController {
     // 删除指定图片
     @DeleteMapping("/remove")
     public Result<Image> remove(@RequestBody Image image) {
-        boolean b = imageService.removeById(image);
-        if (b){
+        boolean isTrue = imageService.removeById(image);
+        if (isTrue){
             return Result.success("删除成功");
         }else {
             return Result.error("删除失败");
@@ -75,9 +74,19 @@ public class ImageController {
     // 批量删除图片
     @DeleteMapping("/removeList")
     public Result<Image> removeList(@RequestBody List<Image> images) {
-        boolean b = imageService.removeByIds(images);
+        boolean isTrue = imageService.removeByIds(images);
+        if (isTrue){
+            return Result.success("删除成功");
+        }else {
+            return Result.error("删除失败");
+        }
+    }
 
-        if (b){
+    // 清空图片
+    @DeleteMapping("/removeAll")
+    public Result<Image> removeAll() {
+        boolean isTrue =  imageService.removeAll();
+        if (isTrue){
             return Result.success("删除成功");
         }else {
             return Result.error("删除失败");

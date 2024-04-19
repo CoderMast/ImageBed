@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.codermast.imagebedbackend.entity.Image;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface ImageService extends IService<Image> {
@@ -12,4 +11,6 @@ public interface ImageService extends IService<Image> {
     Image uploadImage(MultipartFile file);
 
     List<Image> getAll();
+
+    boolean removeAll();
 }
