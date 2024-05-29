@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/image")
 public class ImageController {
@@ -23,7 +25,7 @@ public class ImageController {
 
     // 图片上传
     @PostMapping("/upload")
-    public Result<List<Image>> uploadImage(@RequestParam("file") MultipartFile... files){
+    public Result<List<Image>> uploadImage(@RequestParam("files") MultipartFile... files) {
         List<Image> ret = new ArrayList<>();
         for (MultipartFile file : files) {
 
@@ -63,32 +65,47 @@ public class ImageController {
     // 删除指定图片
     @DeleteMapping("/remove")
     public Result<Image> remove(@RequestBody Image image) {
-        boolean isTrue = imageService.removeById(image);
-        if (isTrue){
+        // 1. 删除数据库
+        boolean dbDeleted = imageService.removeById(image);
+        // 2. 删除文件
+        boolean fileDeleted = new File(image.getUrl()).delete();
+
+        if (dbDeleted && fileDeleted) {
             return Result.success("删除成功");
-        }else {
+        } else {
             return Result.error("删除失败");
         }
     }
 
     // 批量删除图片
     @DeleteMapping("/removeList")
-    public Result<Image> removeList(@RequestBody List<Image> images) {
-        boolean isTrue = imageService.removeByIds(images);
-        if (isTrue){
-            return Result.success("删除成功");
-        }else {
-            return Result.error("删除失败");
+    public Result<List<Result>> removeList(@RequestBody List<Image> images) {
+        List<Result> ret = new ArrayList<>();
+
+        for (Image image : images) {
+            // 1. 删除数据库
+            boolean dbDeleted = imageService.removeById(image);
+
+            // 2. 删除文件
+            boolean fileDeleted = new File(image.getUrl()).delete();
+
+            if (dbDeleted && fileDeleted) {
+                ret.add(Result.success(image));
+            } else {
+                ret.add(Result.error("删除失败！"));
+            }
         }
+
+        return Result.success(ret);
     }
 
     // 清空图片
     @DeleteMapping("/removeAll")
     public Result<Image> removeAll() {
-        boolean isTrue =  imageService.removeAll();
-        if (isTrue){
+        boolean isTrue = imageService.removeAll();
+        if (isTrue) {
             return Result.success("删除成功");
-        }else {
+        } else {
             return Result.error("删除失败");
         }
     }

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class Image {
     @TableId(type = IdType.AUTO)
     private Long id;
+    private String name;
     private String url;
     private String md5;
     private Long author;

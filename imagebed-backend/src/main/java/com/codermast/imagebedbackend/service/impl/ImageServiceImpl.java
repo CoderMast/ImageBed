@@ -7,6 +7,7 @@ import com.codermast.imagebedbackend.entity.Image;
 import com.codermast.imagebedbackend.mapper.ImageMapper;
 import com.codermast.imagebedbackend.service.ImageService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements ImageService {
+    @Value("${upload.path}")
+    private String UPLOAD_DIRECTORY = "upload";
+
     // 图片上传
     @Override
     public Image uploadImage(MultipartFile file) {
@@ -45,7 +49,8 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
             String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
 
             // 文件前置文件目录
-            File preDir = new File("static" + File.separator + "images" + File.separator + year + File.separator + month + File.separator + day);
+            String preDirPath = UPLOAD_DIRECTORY + File.separator + year + File.separator + month + File.separator + day;
+            File preDir = new File(preDirPath);
 
             // 如果文件目录不存在，则创建目录
             if (!preDir.exists()) {
@@ -87,6 +92,7 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
 
             // 构建图片实体
             Image savaImage = new Image();
+            savaImage.setName(file.getOriginalFilename());
             savaImage.setUrl(preDir.getPath() + File.separator + md5 + suffixName);
             savaImage.setMd5(md5);
             savaImage.setUploadTime(LocalDateTime.now());
@@ -114,8 +120,35 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
     // 清空图片
     @Override
     public boolean removeAll() {
+        // 1. 先清空数据库
         LambdaQueryWrapper<Image> queryWrapper = new LambdaQueryWrapper<>();
-        this.remove(queryWrapper);
-        return true;
+        boolean remove = this.remove(queryWrapper);
+        // 2. 再删除文件上传目录下的所有图片文件
+        boolean deleteFile = true;
+        File file = new File(UPLOAD_DIRECTORY);
+        deleteFile = deleteDirectory(file);
+        return remove && deleteFile;
+    }
+
+    // 递归删除目录下的所有文件
+    public static boolean deleteDirectory(File directory) {
+        boolean success = true;
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        // 递归删除子目录
+                        deleteDirectory(file);
+                    } else {
+                        // 删除文件
+                        success = success && file.delete() ;
+                    }
+                }
+            }
+            // 删除空目录
+            success = success && directory.delete();
+        }
+        return success;
     }
 }

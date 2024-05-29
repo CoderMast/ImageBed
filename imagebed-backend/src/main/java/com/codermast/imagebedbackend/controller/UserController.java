@@ -141,4 +141,15 @@ public class UserController {
         BaseContext.removeCurrentId();
         return Result.success("退出成功！");
     }
+
+    // 获取用户详细信息
+    @GetMapping("/{uid}")
+    public Result<User> getUser(@PathVariable("uid") String uid) {
+        User user = userService.getById(uid);
+        if (user == null){
+            return Result.error("用户不存在！");
+        }else {
+            return Result.success(user);
+        }
+    }
 }
