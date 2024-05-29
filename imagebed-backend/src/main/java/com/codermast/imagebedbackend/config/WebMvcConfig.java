@@ -39,7 +39,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     public void addCorsMappings(CorsRegistry registry) {
         // 添加映射路径
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173") // 允许哪些源的请求
+                .allowedOrigins("http://localhost:8080") // 允许哪些源的请求
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // 允许的HTTP方法
                 .allowedHeaders("*") // 允许的请求头
                 .allowCredentials(true); // 是否发送cookie
