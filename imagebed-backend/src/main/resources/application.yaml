@@ -24,3 +24,5 @@ imagebed:
     admin-ttl: 7200000
     # 设置前端传来的令牌名称
     admin-token-name: token
+upload:
+  path: upload/static/images
